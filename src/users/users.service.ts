@@ -4,6 +4,7 @@ import {
   InternalServerErrorException,
   Logger,
 } from '@nestjs/common';
+import * as bcrypt from 'bcrypt';
 import { CreateUserInput } from './dto/create-user.input';
 import { UpdateUserInput } from './dto/update-user.input';
 import { User } from './entities/user.entity';
@@ -22,7 +23,10 @@ export class UsersService {
 
   async create(signupInput: SignupInput): Promise<User> {
     try {
-      const newUser = this.usersRepository.create(signupInput);
+      const newUser = this.usersRepository.create({
+        ...signupInput,
+        password: bcrypt.hashSync(signupInput.password, 10),
+      });
 
       return await this.usersRepository.save(newUser);
     } catch (error) {
