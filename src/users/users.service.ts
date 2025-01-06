@@ -3,6 +3,7 @@ import {
   Injectable,
   InternalServerErrorException,
   Logger,
+  NotFoundException,
 } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { CreateUserInput } from './dto/create-user.input';
@@ -46,6 +47,18 @@ export class UsersService {
         code: 'error--001',
         detail: `User ${email} not found`,
       });
+    }
+  }
+
+  async findOneById(id: string): Promise<User> {
+    try {
+      return await this.usersRepository.findOneByOrFail({ id });
+    } catch (error) {
+      throw new NotFoundException(`User ${id} not found`);
+      // this.handleDBErrors({
+      //   code: 'error--001',
+      //   detail: `User ${id} not found`,
+      // });
     }
   }
 
