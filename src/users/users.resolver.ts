@@ -9,8 +9,7 @@ export class UsersResolver {
 
   @Query(() => [User], { name: 'users' })
   findAll(@Args() validRoles: ValidRolesArgs): Promise<User[]> {
-    console.log({ validRoles });
-    return this.usersService.findAll();
+    return this.usersService.findAll(validRoles.roles);
   }
 
   @Query(() => User, { name: 'user' })
