@@ -23,7 +23,6 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
 
     const user = await this.authService.validateUser(id);
 
-    console.log('user', user);
     return user;
   }
 }
