@@ -4,7 +4,7 @@ import { ValidRoles } from '../../../auth/enums/valid-roles.enum';
 
 @ArgsType()
 export class ValidRolesArgs {
-  @Field(() => [String], { nullable: true })
+  @Field(() => [ValidRoles], { nullable: true })
   @IsArray()
   roles: string[] = [];
 }
