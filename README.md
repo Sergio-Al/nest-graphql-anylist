@@ -18,3 +18,10 @@ docker-compose up -d
 4. Run the project
 `npm run start:dev`
 5. Open `http://localhost:3000/graphql` in your browser
+
+6. Execute the executeSeed mutation to create the initial data
+```
+mutation Mutation {
+  executeSeed
+} 
+```
