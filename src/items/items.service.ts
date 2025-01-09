@@ -30,8 +30,16 @@ export class ItemsService {
     });
   }
 
-  async findOne(id: string): Promise<Item> {
-    const item = await this.itemsRepository.findOneBy({ id });
+  async findOne(id: string, user: User): Promise<Item> {
+    const item = await this.itemsRepository.findOne({
+      where: {
+        id,
+        user: {
+          id: user.id,
+        },
+      },
+      relations: ['user'],
+    });
 
     if (!item) {
       throw new NotFoundException('Item not found');
@@ -50,9 +58,14 @@ export class ItemsService {
     return await this.itemsRepository.save(item);
   }
 
-  async remove(id: string): Promise<Item> {
+  async remove(id: string, user: User): Promise<Item> {
     // TODO: make a soft delete to keep the data
-    const item = await this.findOne(id);
+    const item = await this.findOne(id, user);
+
+    if (!item) {
+      throw new NotFoundException('Item not found');
+    }
+
     await this.itemsRepository.remove(item);
 
     return { ...item, id };
