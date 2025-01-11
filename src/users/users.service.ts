@@ -6,13 +6,13 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
-import { CreateUserInput } from './dto/create-user.input';
 import { UpdateUserInput } from './dto/update-user.input';
 import { User } from './entities/user.entity';
 import { SignupInput } from './../auth/dto/inputs/signup.input';
-import { Repository } from 'typeorm';
+import { Repository, SelectQueryBuilder } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ValidRoles } from 'src/auth/enums/valid-roles.enum';
+import { PaginationArgs, SearchArgs } from 'src/common/dto/args';
 
 @Injectable()
 export class UsersService {
@@ -36,21 +36,40 @@ export class UsersService {
     }
   }
 
-  async findAll(roles: ValidRoles[]): Promise<User[]> {
-    if (roles.length === 0)
-      return this.usersRepository.find({
-        // This is not necessary because we are using a lazy relation in the entity
-        // relations: {
-        //   lastUpdatedBy: true,
-        // },
+  private createUserFilter(
+    paginationArgs: PaginationArgs,
+    searchArgs: SearchArgs,
+  ): SelectQueryBuilder<User> {
+    const { search } = searchArgs;
+    const { offset, limit } = paginationArgs;
+    const query = this.usersRepository
+      .createQueryBuilder()
+      .take(limit)
+      .skip(offset);
+
+    if (search) {
+      query.andWhere('LOWER(fullname) LIKE :fullname', {
+        fullname: `%${search.toLocaleLowerCase()}%`,
       });
+    }
+
+    return query;
+  }
+
+  async findAll(
+    roles: ValidRoles[],
+    paginationArgs: PaginationArgs,
+    searchArgs: SearchArgs,
+  ): Promise<User[]> {
+    if (roles.length === 0)
+      return this.createUserFilter(paginationArgs, searchArgs).getMany();
 
     // This is because we can have ['admin', 'user'] or ['admin']
-    return this.usersRepository
-      .createQueryBuilder()
+    const queryBuilderUser = this.createUserFilter(paginationArgs, searchArgs)
       .andWhere('ARRAY[roles] && ARRAY[:...roles]')
-      .setParameter('roles', roles)
-      .getMany();
+      .setParameter('roles', roles);
+
+    return queryBuilderUser.getMany();
   }
 
   async findOneByEmail(email: string): Promise<User> {
