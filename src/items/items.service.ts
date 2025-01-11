@@ -1,3 +1,4 @@
+import { PaginationArgs } from './../common/dto/args/paginations.args';
 import { Item } from './entities/item.entity';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateItemInput } from './dto/inputs';
@@ -18,9 +19,13 @@ export class ItemsService {
     return await this.itemsRepository.save(newItem);
   }
 
-  async findAll(user?: User): Promise<Item[]> {
+  async findAll(user: User, paginationsArgs: PaginationArgs): Promise<Item[]> {
+    const { offset, limit } = paginationsArgs;
+
     // TODO: filter by user, pagination, etc.
     return this.itemsRepository.find({
+      take: limit,
+      skip: offset,
       where: {
         user: {
           id: user.id,
