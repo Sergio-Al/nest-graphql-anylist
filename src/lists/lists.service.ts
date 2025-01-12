@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateListInput } from './dto/create-list.input';
 import { UpdateListInput } from './dto/update-list.input';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -53,7 +53,7 @@ export class ListsService {
     });
 
     if (!list) {
-      throw new Error('List not found');
+      throw new NotFoundException('List not found');
     }
 
     return list;
@@ -65,10 +65,13 @@ export class ListsService {
     user: User,
   ): Promise<List> {
     await this.findOne(id, user);
-    const list = await this.listsRepository.preload(updateListInput);
+    const list = await this.listsRepository.preload({
+      ...updateListInput,
+      user,
+    });
 
     if (!list) {
-      throw new Error('List not found');
+      throw new NotFoundException('List not found');
     }
 
     return await this.listsRepository.save(list);
