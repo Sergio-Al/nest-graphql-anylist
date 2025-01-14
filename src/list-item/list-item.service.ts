@@ -66,18 +66,39 @@ export class ListItemService {
     updateListItemInput: UpdateListItemInput,
   ): Promise<ListItem> {
     const { listId, itemId, ...rest } = updateListItemInput;
-    const listItem = await this.listItemsRepository.preload({
-      ...rest,
-      list: { id: listId },
-      item: { id: itemId },
-    });
 
-    if (!listItem) {
-      throw new NotFoundException('List Item not found');
-    }
+    const queryBuilder = this.listItemsRepository
+      .createQueryBuilder()
+      .update()
+      .set(rest)
+      .where('id = :id', { id });
 
-    return this.listItemsRepository.save(listItem);
+    if (listId) queryBuilder.set({ list: { id: listId } });
+    if (itemId) queryBuilder.set({ item: { id: itemId } });
+
+    await queryBuilder.execute();
+
+    return this.findOne(id);
   }
+
+  // this is the original update method
+  // async update(
+  //   id: string,
+  //   updateListItemInput: UpdateListItemInput,
+  // ): Promise<ListItem> {
+  //   const { listId, itemId, ...rest } = updateListItemInput;
+  //   const listItem = await this.listItemsRepository.preload({
+  //     ...rest,
+  //     list: { id: listId },
+  //     item: { id: itemId },
+  //   });
+
+  //   if (!listItem) {
+  //     throw new NotFoundException('List Item not found');
+  //   }
+
+  //   return this.listItemsRepository.save(listItem);
+  // }
 
   remove(id: number) {
     return `This action removes a #${id} listItem`;
