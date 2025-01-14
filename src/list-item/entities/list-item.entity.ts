@@ -30,6 +30,6 @@ export class ListItem {
   list: List;
 
   @ManyToOne(() => Item, (item) => item.listItem, { lazy: true })
-  // @Field(() => Item)
+  @Field(() => Item)
   item: Item;
 }

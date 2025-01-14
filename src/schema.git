@@ -20,13 +20,15 @@ type List {
   name: String!
   user: User!
   listItem: [ListItem!]!
-  items: [ListItem!]!
+  items(offset: Int = 0, limit: Int = 10, search: String): [ListItem!]!
+  totalItems: Float!
 }
 
 type ListItem {
   id: ID!
   quantity: Float!
   completed: Boolean!
+  item: Item!
 }
 
 type Item {
@@ -49,7 +51,6 @@ type Query {
   user(id: ID!): User!
   lists(offset: Int = 0, limit: Int = 10, search: String): [List!]!
   list(id: ID!): List!
-  listItem: [ListItem!]!
   revalidate: AuthResponse!
 }
 
