@@ -20,13 +20,13 @@ type List {
   name: String!
   user: User!
   listItem: [ListItem!]!
+  items: [ListItem!]!
 }
 
 type ListItem {
   id: ID!
   quantity: Float!
   completed: Boolean!
-  item: Item!
 }
 
 type Item {
@@ -49,8 +49,8 @@ type Query {
   user(id: ID!): User!
   lists(offset: Int = 0, limit: Int = 10, search: String): [List!]!
   list(id: ID!): List!
+  listItem: [ListItem!]!
   revalidate: AuthResponse!
-  listItem(id: Int!): ListItem!
 }
 
 """Valid roles for users"""
@@ -69,14 +69,12 @@ type Mutation {
   createList(createListInput: CreateListInput!): List!
   updateList(updateListInput: UpdateListInput!): List!
   removeList(id: ID!): List!
+  createListItem(createListItemInput: CreateListItemInput!): ListItem!
   signup(signupInput: SignupInput!): AuthResponse!
   login(loginInput: LoginInput!): AuthResponse!
 
   """Execute seed"""
   executeSeed: Boolean!
-  createListItem(createListItemInput: CreateListItemInput!): ListItem!
-  updateListItem(updateListItemInput: UpdateListItemInput!): ListItem!
-  removeListItem(id: Int!): ListItem!
 }
 
 input CreateItemInput {
@@ -108,6 +106,13 @@ input UpdateListInput {
   id: ID!
 }
 
+input CreateListItemInput {
+  quantity: Float = 0
+  completed: Boolean = false
+  listId: ID!
+  itemId: ID!
+}
+
 input SignupInput {
   email: String!
   fullname: String!
@@ -117,15 +122,4 @@ input SignupInput {
 input LoginInput {
   email: String!
   password: String!
-}
-
-input CreateListItemInput {
-  """Example field (placeholder)"""
-  exampleField: Int!
-}
-
-input UpdateListItemInput {
-  """Example field (placeholder)"""
-  exampleField: Int
-  id: Int!
 }
