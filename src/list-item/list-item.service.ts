@@ -61,8 +61,22 @@ export class ListItemService {
     return listItem;
   }
 
-  update(id: number, updateListItemInput: UpdateListItemInput) {
-    return `This action updates a #${id} listItem`;
+  async update(
+    id: string,
+    updateListItemInput: UpdateListItemInput,
+  ): Promise<ListItem> {
+    const { listId, itemId, ...rest } = updateListItemInput;
+    const listItem = await this.listItemsRepository.preload({
+      ...rest,
+      list: { id: listId },
+      item: { id: itemId },
+    });
+
+    if (!listItem) {
+      throw new NotFoundException('List Item not found');
+    }
+
+    return this.listItemsRepository.save(listItem);
   }
 
   remove(id: number) {
