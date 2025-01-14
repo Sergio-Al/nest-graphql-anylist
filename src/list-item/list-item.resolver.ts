@@ -24,10 +24,10 @@ export class ListItemResolver {
   //   return this.listItemService.findAll();
   // }
 
-  // @Query(() => ListItem, { name: 'listItem' })
-  // findOne(@Args('id', { type: () => Int }) id: number) {
-  //   return this.listItemService.findOne(id);
-  // }
+  @Query(() => ListItem, { name: 'listItem' })
+  findOne(@Args('id', { type: () => String }) id: string): Promise<ListItem> {
+    return this.listItemService.findOne(id);
+  }
 
   // @Mutation(() => ListItem)
   // updateListItem(@Args('updateListItemInput') updateListItemInput: UpdateListItemInput) {
